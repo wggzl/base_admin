@@ -1,0 +1,29 @@
+{
+    "name": "base/base-admin",
+    "description": "An admin api library with JWT and RBAC",
+    "keywords": [
+        "laravel",
+        "base",
+        "base-admin",
+        "admin"
+    ],
+    "require": {
+        "php": "^7.3|^8.0",
+        "laravel/framework": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Basic\\Admin\\":"src/basic/admin"
+        },
+        "files": [
+            "src/basic/admin/helper.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers":[
+                "Basic\\Admin\\ServiceProvider"
+            ]
+        }
+    }
+}
