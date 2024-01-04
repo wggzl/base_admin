@@ -1,6 +1,7 @@
 <?php
 namespace Basic\Admin;
 use Basic\Admin\Captcha\Captcha;
+use Basic\Admin\Service\Cache;
 use Basic\Admin\Support\Loader;
 use Illuminate\Foundation\AliasLoader;
 use \Illuminate\Support\ServiceProvider as BaseServiceProvider;
@@ -13,13 +14,41 @@ class ServiceProvider extends BaseServiceProvider
         'ResponseCode' => Http\ResponseCode::class,
     ];
 
+    /**
+     * 路由中间件
+     *
+     * @var array
+     */
+    protected $routeMiddleware = [
+        'basic-admin.auth' => Middleware\Authenticate::class,
+        'basic-admin.admin-auth' => Middleware\AdminCheck::class,
+        'basic-admin.permission' => Middleware\Permission::class,
+    ];
+
+    /**
+     * 中间件分组
+     *
+     * @var array
+     */
+    protected $middlewareGroups = [
+        'basic-admin' => [
+            'basic-admin.auth',
+            'basic-admin.permission',
+        ],
+    ];
+
     public function register()
     {
         //配置
         $this->registerConfig();
         //别名
         $this->registerAlias();
-        //绑定暂缓
+        //绑定
+        $this->registerBind();
+        //推送
+        $this->registerPublishing();
+        //注册路由中间件
+        $this->registerRouteMiddleware();
     }
 
     //配置
@@ -76,7 +105,41 @@ class ServiceProvider extends BaseServiceProvider
                 ->withAllowCredentials($config['allow_credentials']);
             return $httpResponse;
         });
+
+        //缓存
+        $this->app->singleton('base-admin.cache', function () {
+            $cache = new Cache();
+            return $cache->store();
+        });
+
+        //暂缓
     }
+
+    //推送
+    protected function registerPublishing() {
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../resources/config' => config_path()
+            ], 'base-admin-config');
+        }
+    }
+
+    //中间件
+    protected function registerRouteMiddleware()
+    {
+        // register route middleware.
+        foreach ($this->routeMiddleware as $key => $middleware) {
+            app('router')->aliasMiddleware($key, $middleware);
+        }
+
+        // register middleware group.
+        foreach ($this->middlewareGroups as $key => $middleware) {
+            app('router')->middlewareGroup($key, $middleware);
+        }
+    }
+
+
+
 
 
 

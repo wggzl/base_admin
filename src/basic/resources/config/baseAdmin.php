@@ -4,6 +4,9 @@ return [
     'captcha' => [
 
     ],
+    'cache' => [
+        'store' => env('BASIC_ADMIN_CACHE_STORE', 'default'),
+    ],
     'response'  => [
         'json' => [
             'is_allow_origin'   => env('BASIC_ADMIN_RESPONSE_JSON_IS_ALLOW_ORIGIN', 1),
@@ -17,4 +20,11 @@ return [
             'max_age'           => env('BASIC_ADMIN_RESPONSE_JSON_MAX_AGE', ''),
         ]
     ],
+    'route' => [
+        'domain'        => env('BASIC_ADMIN_ROUTE_DOMAIN', null),
+        'prefix'        => env('BASIC_ADMIN_ROUTE_PREFIX', 'admin-api'),
+        'middleware'    => env('BASIC_ADMIN_ROUTE_MIDDLEWARE') ? explode(',', env('BASIC_ADMIN_ROUTE_MIDDLEWARE')) : ['basic-admin'],
+        'namespace'     => env('BASIC_ADMIN_ROUTE_NAMESPACE', 'Basic\\Admin\\Controller'),
+        'as'            => env('BASIC_ADMIN_ROUTE_AS', 'basic-admin.'),
+    ]
 ];
